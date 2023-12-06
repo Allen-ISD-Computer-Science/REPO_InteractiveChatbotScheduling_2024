@@ -12,3 +12,4 @@ For each activity the user enters, they will be asked questions such as “Is th
 
 - Project Manager | Rey Perez | ReyMPerez | [Digital Portfolio](https://www.codermerlin.academy/users/rey-perez/Digital%20Portfolio/index.html)
 - Product Manager | Sai Paladugu | saip9 | [Digital Portfolio](https://www.codermerlin.academy/users/sri-nagasai-siva-paladugu/Digital%20Portfolio/index.html)
+- Release Manager | Jackson Adamcik | JacksonA378 | [Digital Portfolio](https://www.codermerlin.academy/users/jackson-adamcik/Digital%20Portfolio/index.html)
