@@ -15,14 +15,41 @@
       position: relative;
   }
 
+  .top {
+      position: fixed;
+      top: 0;
+  }
+  
   .center {
       position: absolute;
       top: 40%;
       width: 100%;
       text-align: center;
-      font-size: 36px;
   }
 
+  .bottom {
+      position: fixed;
+      bottom: 0;
+  }
+
+  #chatScreen {
+      position: fixed;
+      top: 0;
+      left: 25%;
+      height: 100%;
+      width: 50%;
+      background-color: #f1f1f1;
+      display: none;
+  }
+
+  #chatScreen img {
+      width: 8%;
+      height: auto;
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+  }
+  
   .button {
       background-color: #62275c;
       border: none;
@@ -37,11 +64,11 @@
       font-size: 24px;
       margin: auto;
       cursor: pointer;
-      
   }
   
   h1 {
       color: white;
+      font-size: 50px;
       font-family: courier;
   }
   
@@ -54,9 +81,11 @@
       width: 100%;
       background-color: #333;
   }
+  
   li{
       float: left;
   }
+  
   li, a {
       display: block;
       color: white;
@@ -64,19 +93,20 @@
       padding: 14px 16px;
       text-decoration: none;
   }
+  
   li a:hover:not(.active) {
       background-color: #111;
   }
+  
   .active {
       background-color: #62275c
   }
 </style>
 </head>
 
-<script src=""></script>
 <body>
 
-  <ul>
+  <ul class="ul">
     <li class="active" href="#home">Home</li>
     <li href="#about">About</li>
     <li href="#contact">Contact</li>
@@ -84,8 +114,19 @@
 
   <div class="center">
     <h1>Interactive Chatbot Scheduling</h1>
-    <a href="https://codermerlin.academy" class="button">Chat</a>
+    <button class="button" onClick="displayScreen()">Chat</button>
   </div>
+
+  <div id="chatScreen">
+    <img src="https://www.iconninja.com/files/148/341/227/telegram-send-chat-media-message-icon.svg" alt="Send button">
+  </div>
+
+  <script>
+    function displayScreen() {
+	var screen = document.getElementById("chatScreen");
+	screen.style.display = "block";
+    }
+  </script>
 
 </body>
 </html>
