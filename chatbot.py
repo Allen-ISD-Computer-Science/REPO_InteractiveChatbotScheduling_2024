@@ -19,15 +19,20 @@ def chatbot_response(request):
   return requestResponse
 
 def request_school_response():
-  print( 'Ok. I understand that you need help with organzation related to school.' )
+  print( 'Ok. I understand that you need help with organization related to school.' )
   schoolEnd = input("When does your school end? ")
+
+def request_work_response():
+    print( 'Ok. I understand that you need help with organization related to work.' )
 
 
 while True:
-  request=input(name+':')
-  if request=='Bye' or request =='bye':
+  request=input(name+': ')
+  if request=='Bye' or request =='bye' or request == 'BYE':
     print('Bot: Bye')
     break
   response = chatbot_response(request)
   if response == 1:
     request_school_response()
+  elif response == 2:
+      request_work_response()
