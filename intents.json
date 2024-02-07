@@ -1,0 +1,18 @@
+{"intents": [
+      {"tag": "greeting",
+       "patterns": ["Hello","Howdy","Hi","Hey","Could you help me?"],
+       "responses": ["I am here to help you", "Thanks for asking, how can I help you today?", "Hi, hope you are having a nice day!"],
+       "context": [""]
+      },
+  
+  
+      {"tag": "bye",
+       "patterns": ["See you later", "I don't need your help anymore", "I had a nice time chatting with you today.", "Let's meet again tommorow!"],
+       "responses": ["I loved working with you!", "Have a great day!", "Thank you", "Bye"],
+       "context": [""]
+      
+      }
+      
+      
+      ]
+}
