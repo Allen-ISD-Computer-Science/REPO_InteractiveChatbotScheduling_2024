@@ -9,8 +9,9 @@ source .venv/bin/activate
 
 # Install required packages
 python3 -m pip install \
-   gTTS \
-   transformers \
-   tensorflow
+   nltk \
+   flask \
+   pandas \
+   datetime \
    
     
