@@ -10,6 +10,7 @@ app = Flask(__name__)
 # As each valid task is submitted by the user, it gets added to the tasks array which will be used to display the table 
 tasks = []
 studentStartTime = None
+studentEndTime = None
 currentTask = None
 
 # Matches the user input with the one of the responses listed in the pairs
@@ -27,6 +28,11 @@ def setStudentStartTime(userInput):
   global studentStartTime
   studentStartTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
   return studentStartTime.strftime("%Y-%m-%d %H:%M:%S")
+
+def setStudentEndTime(userInput):
+  global studentEndTime
+  studentEndTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
+  return studentEndTime.strftime("%Y-%m-%d %H:%M:%S")
 
 def calculateTaskTime(task):
   global studentStartTime
@@ -76,6 +82,10 @@ pairs = [
         [lambda userInput: "You will begin your tasks at " + setStudentStartTime(userInput) if not studentStartTime else "Start time is already set."] # Prompts the user to set a start time if they try to add a task before setting it
     ],
     [
+      r"set start time (.*)",
+      [lambda userInput: "You will end your tasks at " + setStudentEndTime(userInput) if not studentEndTime else "End time is already set."] # Prompts the user to set a start time if they try to add a task before setting it
+    ],
+    [
         r"display tasks",
         [lambda: "Here are your tasks that you need to complete:\n" + displayTaskTable()]
     ],
@@ -93,8 +103,4 @@ def get_chatbot_response():
     return str(chat.respond(displayResponse))
 
 if __name__ == '__main__':
-      print("About to run...")
-      port = int(os.environ.get('VAPOR_LOCAL_PORT', 5000)) 
-      host = os.environ.get('VAPOR_LOCAL_HOST', "127.0.0.1")
-      print("About to run with port ", port, " and host ", host)
-      app.run(port=port, host=host)
+      app.run()
