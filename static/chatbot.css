@@ -1,0 +1,17 @@
+body {
+  background: linear-gradient(-90deg, #62275c, #000000, #1b1f52)
+}
+
+
+#chatbox {
+  height: 300px;
+  overflow-y: auto;
+}
+.user-input {
+  text-align: right;
+  margin: 20px;
+}
+.chatbot-response {
+  text-align: left;
+  margin: 30px;
+}
