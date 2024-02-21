@@ -51,7 +51,9 @@ def calculateTaskTime(task):
     taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration[task])
     if taskCompletionTime > studentEndTime :
        taskCompletionTime = studentEndTime
-       return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+       tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+       return "The task has been added. Since the task exceeds the endTime, the completion for this task is the endTime. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+       
     studentStartTime = taskCompletionTime
     currentTask = task
     tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
