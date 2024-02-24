@@ -14,14 +14,23 @@ studentEndTime = None
 currentTask = None
 
 # Matches the user input with the one of the responses listed in the pairs
-
          
-taskDuration= {
-  'English essay': 120,
-  'coding assignment': 60,
-  'class notes': 45,
-  'study for test': 60,
-  'watch Heimler videos': 30
+taskList = [
+  'essay',
+  'coding',
+  'notes',
+  'test',
+  'quiz',
+  'videos'
+]
+
+taskDuration = {
+  'essay': 120,
+  'coding': 60,
+  'notes': 45,
+  'test': 60,
+  'quiz': 40,
+  'videos': 30
 }
 
 def setStudentStartTime(userInput):
@@ -47,21 +56,82 @@ def removeStudentEndTime():
 def calculateTaskTime(task):
   global studentStartTime
   global currentTask
-  if task in taskDuration:
-    taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration[task])
-    if taskCompletionTime > studentEndTime :
-       taskCompletionTime = studentEndTime
-       tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
-       return "The task has been added. Since the task exceeds the endTime, the completion for this task is the endTime. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
-       
+  taskSplit = task.split()
+
+  if 'quiz' in taskSplit:
+    taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['quiz'])
+    preparation = input("How prepared are you for the quiz? (1=Not Prepared, 4=Mostly Prepared)")
+    while True:
+      if preparation == "1":
+        taskCompletionTime += datetime.timedelta(minutes=30)
+        break
+      elif preparation == "2":
+        taskCompletionTime += datetime.timedelta(minutes=15)
+        break
+      elif preparation == "3":
+        taskCompletionTime
+        break
+      elif preparation == "4":
+        taskCompletionTime -= datetime.timedelta(minutes=10)
+        break
+      else:
+        preparation = input("How prepared are you for the quiz? (1=Not Prepared, 4=Mostly Prepared)")
+    if taskCompletionTime > studentEndTime:
+      taskCompletionTime = studentEndTime
+      tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+      return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
     studentStartTime = taskCompletionTime
     currentTask = task
     tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
     return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+  
+  elif 'test' in taskSplit:
+    taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['test'])
+    preparation = input("How prepared are you for the test? (1=Not Prepared, 4=Mostly Prepared)")
+    while True:
+      if preparation == "1":
+        taskCompletionTime += datetime.timedelta(minutes=30)
+        break
+      elif preparation == "2":
+        taskCompletionTime += datetime.timedelta(minutes=15)
+        break
+      elif preparation == "3":
+        taskCompletionTime
+        break
+      elif preparation == "4":
+        taskCompletionTime -= datetime.timedelta(minutes=10)
+        break
+      else:
+        preparation = input("How prepared are you for the test? (1=Not Prepared, 4=Mostly Prepared)")
+    if taskCompletionTime > studentEndTime:
+      taskCompletionTime = studentEndTime
+      tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+      return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+    studentStartTime = taskCompletionTime
+    currentTask = task
+    tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+    return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+      
   else:
-    return "The task you entered cannot be found. Supported tasks are:\n\n" + '\n'.join(f'- {task}' for task in taskDuration.keys()) 
+    elementIndex = -1
+    for x in range(0, len(taskSplit) - 1):
+      if taskSplit[x] in taskList:
+        elementIndex = x
+        break
 
- 
+    if elementIndex != -1:
+      taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration[taskSplit[elementIndex]])
+      if taskCompletionTime > studentEndTime:
+        taskCompletionTime = studentEndTime
+        tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+        return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+      
+      studentStartTime = taskCompletionTime
+      currentTask = task
+      tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+      return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+      return "The task you entered cannot be found. Supported tasks are:\n\n" + '\n'.join(f'- {task}' for task in taskDuration.keys())
 
 def displayTaskTable():
   df = pd.DataFrame(tasks, columns=['Task', 'Completion Time'])
