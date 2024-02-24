@@ -114,7 +114,7 @@ def calculateTaskTime(task):
       
   else:
     elementIndex = -1
-    for x in range(0, len(taskSplit) - 1):
+    for x in range(0, len(taskSplit)):
       if taskSplit[x] in taskList:
         elementIndex = x
         break
