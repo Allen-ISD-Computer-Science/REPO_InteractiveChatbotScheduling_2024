@@ -120,7 +120,13 @@ def calculateTaskTime(task):
         break
 
     if elementIndex != -1:
+      dueDateQuestion = input("Do you have any specific due date that the task has to be completed by? [yes/no] ")
+      if dueDateQuestion == "yes":
+        dueDateTime = input("What is the due date for this task? [YYYY-MM-DD HH:MM:SS]")
+        convertedDueDate = datetime.datetime.strptime(dueDateTime,"%Y-%m-%d %H:%M:%S")
       taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration[taskSplit[elementIndex]])
+      if taskCompletionTime > convertedDueDate:
+          return "The task cannot be added as it is exceeds the due date."
       if taskCompletionTime > studentEndTime:
         taskCompletionTime = studentEndTime
         tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
