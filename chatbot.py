@@ -35,8 +35,11 @@ taskDuration = {
 
 def setStudentStartTime(userInput):
   global studentStartTime
+  checkStartTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
+  if studentEndTime != None and checkStartTime > studentEndTime:
+    return "The start time could not be added as it is not consistent with the provided end time.\nEnd Time: " + str(studentEndTime)
   studentStartTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
-  return studentStartTime.strftime("%Y-%m-%d %H:%M:%S")
+  return "You will begin your tasks at " + studentStartTime.strftime("%Y-%m-%d %H:%M:%S")
 
 def removeStudentStartTime():
   global studentStartTime
@@ -45,8 +48,11 @@ def removeStudentStartTime():
 
 def setStudentEndTime(userInput):
   global studentEndTime
+  checkEndTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
+  if studentStartTime != None and checkEndTime < studentStartTime:
+    return "The end time could not be added as it is not consistent with the provided start time.\nStart Time: " + str(studentStartTime)
   studentEndTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
-  return studentEndTime.strftime("%Y-%m-%d %H:%M:%S")
+  return "You will end your tasks at " + studentEndTime.strftime("%Y-%m-%d %H:%M:%S")
 
 def removeStudentEndTime():
   global studentEndTime
@@ -170,7 +176,7 @@ pairs = [
     ],
     [
         r"set start time (.*)",
-        [lambda userInput: "You will begin your tasks at " + setStudentStartTime(userInput) if not studentStartTime else "Start time is already set."] # Prompts the user to set a start time if they try to add a task before setting it
+        [lambda userInput: setStudentStartTime(userInput) if not studentStartTime else "Start time is already set."] # Prompts the user to set a start time if they try to add a task before setting it
     ],
     [
         r"remove start time",
@@ -178,7 +184,7 @@ pairs = [
     ],
     [
         r"set end time (.*)",
-        [lambda userInput: "You will end your tasks at " + setStudentEndTime(userInput) if not studentEndTime else "End time is already set."] # Prompts the user to set a start time if they try to add a task before setting it
+        [lambda userInput: setStudentEndTime(userInput) if not studentEndTime else "End time is already set."] # Prompts the user to set a start time if they try to add a task before setting it
     ],
     [
         r"remove end time",
