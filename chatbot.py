@@ -12,6 +12,8 @@ tasks = []
 studentStartTime = None
 studentEndTime = None
 currentTask = None
+# As the user has not added any tasks, the taskNumber is set to 0
+taskNumber = 0
 
 # Matches the user input with the one of the responses listed in the pairs
          
@@ -53,11 +55,14 @@ def removeStudentEndTime():
   studentEndTime = None
   return "End time removed successfully."
 
+def addTaskNumber():
+  global taskNumber
+  taskNumber += 1 
+
 def calculateTaskTime(task):
   global studentStartTime
   global currentTask
   taskSplit = task.split()
-
   if 'quiz' in taskSplit:
     taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['quiz'])
     preparation = input("How prepared are you for the quiz? (1=Not Prepared, 4=Mostly Prepared)")
@@ -79,6 +84,7 @@ def calculateTaskTime(task):
     if taskCompletionTime > studentEndTime:
       taskCompletionTime = studentEndTime
       tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+      addTaskNumber()
       return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
     studentStartTime = taskCompletionTime
     currentTask = task
@@ -109,7 +115,8 @@ def calculateTaskTime(task):
       return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
     studentStartTime = taskCompletionTime
     currentTask = task
-    tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+    addTaskNumber()
+    tasks.append((taskNumber,task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
     return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
       
   else:
@@ -122,14 +129,17 @@ def calculateTaskTime(task):
     if elementIndex != -1:
       dueDateQuestion = input("Do you have any specific due date that the task has to be completed by? [yes/no] ")
       if dueDateQuestion == "yes":
-        dueDateTime = input("What is the due date for this task? [YYYY-MM-DD HH:MM:SS]")
+        dueDateTime = input("What is the due date for this task? [YYYY-MM-DD HH:MM:SS] ")
         convertedDueDate = datetime.datetime.strptime(dueDateTime,"%Y-%m-%d %H:%M:%S")
+        if taskCompletionTime > convertedDueDate:
+            return "The task cannot be added as it is exceeds the due date."
       taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration[taskSplit[elementIndex]])
-      if taskCompletionTime > convertedDueDate:
-          return "The task cannot be added as it is exceeds the due date."
+    
       if taskCompletionTime > studentEndTime:
         taskCompletionTime = studentEndTime
-        tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+        addTaskNumber()
+        tasks.append((taskNumber,task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+
         return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
       
       studentStartTime = taskCompletionTime
@@ -140,7 +150,7 @@ def calculateTaskTime(task):
       return "The task you entered cannot be found. Supported tasks are:\n\n" + '\n'.join(f'- {task}' for task in taskDuration.keys())
 
 def displayTaskTable():
-  df = pd.DataFrame(tasks, columns=['Task', 'Completion Time'])
+  df = pd.DataFrame(tasks, columns=['Task #','Name', 'Completion Time'])
   return df.to_html(index=False)
 
 class SchedulerChatbot(Chat):
