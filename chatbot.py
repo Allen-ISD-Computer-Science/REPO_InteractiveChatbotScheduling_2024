@@ -3,6 +3,8 @@ from flask import Flask, render_template, request
 import pandas as pd
 import random
 import datetime
+import pytz
+import time
 import os
 
 
@@ -35,9 +37,13 @@ taskDuration = {
 
 def setStudentStartTime(userInput):
   global studentStartTime
+
   checkStartTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
   if studentEndTime != None and checkStartTime > studentEndTime:
     return "The start time could not be added as it is not consistent with the provided end time.\nEnd Time: " + str(studentEndTime)
+  elif checkStartTime < datetime.datetime.now():
+    return "The start time could not be added as it is not consistent with the current date.\nCurrent Date: " + str(datetime.datetime.now().astimezone(pytz.timezone('US/Central')).strftime('%Y-%m-%d %H:%M:%S %Z%z'))
+  
   studentStartTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
   return "You will begin your tasks at " + studentStartTime.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -48,6 +54,7 @@ def removeStudentStartTime():
 
 def setStudentEndTime(userInput):
   global studentEndTime
+
   checkEndTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
   if studentStartTime != None and checkEndTime < studentStartTime:
     return "The end time could not be added as it is not consistent with the provided start time.\nStart Time: " + str(studentStartTime)
@@ -59,6 +66,10 @@ def removeStudentEndTime():
   studentEndTime = None
   return "End time removed successfully."
 
+def checkPreparation():
+  print("Here!")
+  return "How prepared are you for the assessment? (1=Not Prepared, 4=Mostly Prepared)"
+
 def calculateTaskTime(task):
   global studentStartTime
   global currentTask
@@ -66,8 +77,8 @@ def calculateTaskTime(task):
 
   if 'quiz' in taskSplit:
     taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['quiz'])
-    preparation = input("How prepared are you for the quiz? (1=Not Prepared, 4=Mostly Prepared)")
     while True:
+      preparation = input("How prepared are you for the quiz? (1=Not Prepared, 4=Mostly Prepared)")
       if preparation == "1":
         taskCompletionTime += datetime.timedelta(minutes=30)
         break
@@ -80,8 +91,6 @@ def calculateTaskTime(task):
       elif preparation == "4":
         taskCompletionTime -= datetime.timedelta(minutes=10)
         break
-      else:
-        preparation = input("How prepared are you for the quiz? (1=Not Prepared, 4=Mostly Prepared)")
     if taskCompletionTime > studentEndTime:
       taskCompletionTime = studentEndTime
       tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
@@ -93,8 +102,9 @@ def calculateTaskTime(task):
   
   elif 'test' in taskSplit:
     taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['test'])
-    preparation = input("How prepared are you for the test? (1=Not Prepared, 4=Mostly Prepared)")
     while True:
+      preparation = input("How prepared are you for the test? (1=Not Prepared, 4=Mostly Prepared)")
+      checkPreparation()
       if preparation == "1":
         taskCompletionTime += datetime.timedelta(minutes=30)
         break
@@ -107,8 +117,6 @@ def calculateTaskTime(task):
       elif preparation == "4":
         taskCompletionTime -= datetime.timedelta(minutes=10)
         break
-      else:
-        preparation = input("How prepared are you for the test? (1=Not Prepared, 4=Mostly Prepared)")
     if taskCompletionTime > studentEndTime:
       taskCompletionTime = studentEndTime
       tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
@@ -159,7 +167,6 @@ class SchedulerChatbot(Chat):
           return resp(*match.groups())
         else:
           return resp
-             
 
 pairs = [
      [
@@ -167,16 +174,17 @@ pairs = [
         ["Hello!", "Hi!", "How are you today?", "Nice to meet you!"]
     ],
        [
-        r"Bye|Quit|See you tommorow|That's all the help I need",
+        r"Bye|Quit|See you tomorrow|That's all the help I need",
         ["It was my pleasure helping you today!", "Have a great day!", "Bye! See you later!"]
     ],
    [
         r"add task (.*)",
-        [lambda userInput: calculateTaskTime(userInput) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)]
+        [lambda userInput: calculateTaskTime(userInput) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime), lambda: checkPreparation() ]
     ],
+
     [
         r"set start time (.*)",
-        [lambda userInput: setStudentStartTime(userInput) if not studentStartTime else "Start time is already set."] # Prompts the user to set a start time if they try to add a task before setting it
+        [lambda userInput: setStudentStartTime(userInput) if not studentStartTime else "Start time is already set."], # Prompts the user to set a start time if they try to add a task before setting it
     ],
     [
         r"remove start time",
@@ -205,7 +213,8 @@ def landing():
 @app.route("/get")
 def get_chatbot_response():
     displayResponse = request.args.get('msg')
-    return str(chat.respond(displayResponse))
+    resp = str(chat.respond(displayResponse))
+    return resp
 
 if __name__ == '__main__':
       app.run()
