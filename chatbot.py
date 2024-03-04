@@ -39,7 +39,6 @@ taskDuration = {
 
 def setStudentStartTime(userInput):
   global studentStartTime
-
   checkStartTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
   if studentEndTime != None and checkStartTime > studentEndTime:
     return "The start time could not be added as it is not consistent with the provided end time.\nEnd Time: " + str(studentEndTime)
@@ -56,12 +55,11 @@ def removeStudentStartTime():
 
 def setStudentEndTime(userInput):
   global studentEndTime
-
   checkEndTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
   if studentStartTime != None and checkEndTime < studentStartTime:
     return "The end time could not be added as it is not consistent with the provided start time.\nStart Time: " + str(studentStartTime)
-  studentEndTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
-  return "You will end your tasks at " + studentEndTime.strftime("%Y-%m-%d %H:%M:%S")
+  elif checkEndTime < datetime.datetime.now():
+    return "The end time could not be added as it is not consistent with the current date.\nCurrent Date: " + str(datetime.datetime.now().astimezone(pytz.timezone('US/Central')).strftime('%Y-%m-%d %H:%M:%S %Z%z'))
 
 def removeStudentEndTime():
   global studentEndTime
@@ -106,7 +104,6 @@ def calculateTaskTime(task):
     taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['test'])
     while True:
       preparation = input("How prepared are you for the test? (1=Not Prepared, 4=Mostly Prepared)")
-      checkPreparation()
       if preparation == "1":
         taskCompletionTime += datetime.timedelta(minutes=30)
         break
@@ -149,7 +146,6 @@ def calculateTaskTime(task):
         taskCompletionTime = studentEndTime
         addTaskNumber()
         tasks.append((taskNumber,task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
-
         return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
       
       studentStartTime = taskCompletionTime
@@ -185,7 +181,7 @@ pairs = [
     ],
    [
         r"add task (.*)",
-        [lambda userInput: calculateTaskTime(userInput) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime), lambda: checkPreparation() ]
+        [lambda userInput: calculateTaskTime(userInput) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)]
     ],
 
     [
