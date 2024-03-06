@@ -60,6 +60,9 @@ def setStudentEndTime(userInput):
     return "The end time could not be added as it is not consistent with the provided start time.\nStart Time: " + str(studentStartTime)
   elif checkEndTime < datetime.datetime.now():
     return "The end time could not be added as it is not consistent with the current date.\nCurrent Date: " + str(datetime.datetime.now().astimezone(pytz.timezone('US/Central')).strftime('%Y-%m-%d %H:%M:%S %Z%z'))
+  
+  studentEndTime = datetime.datetime.strptime(userInput,"%Y-%m-%d %H:%M:%S")
+  return "You will end your tasks at " + studentEndTime.strftime("%Y-%m-%d %H:%M:%S")
 
 def removeStudentEndTime():
   global studentEndTime

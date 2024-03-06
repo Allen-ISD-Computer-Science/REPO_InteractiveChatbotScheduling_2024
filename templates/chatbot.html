@@ -11,8 +11,34 @@ body {
   background: linear-gradient(-90deg, #62275c, #000000, #1b1f52)
 }
 
+.center {
+  position: absolute;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
 h1 {
     font-family: verdana;
+}
+
+table {
+  position: absolute;
+  top: 9%;
+  left: 1%;
+}
+
+th, td {
+  padding: 10px;
+  width: 300px;
+}
+
+.button {
+  position: absolute;
+  top: 5%;
+  left: 10%;
+  background-color: black;
+  font-family: verdana;
 }
 
 #chatbox {
@@ -42,8 +68,52 @@ h1 {
             </div>
         </div>
     </div>
+
+    <div>
+      <button class="button" onclick="displayGuide()">Help</button>
+      <table id="guideTable" style="display:none;">
+        <tr>
+          <th>Command</th>
+          <th>Function</th>
+        </tr>
+        <tr>
+          <td>set start time (time)</td>
+          <td>Defines the startTime of the user</td>
+        </tr>
+        <tr>
+          <td>remove start time</td>
+          <td>Removes the currently set startTime, if applicable</td>
+        </tr>
+        <tr>
+          <td>set end time (time)</td>
+          <td>Defines the endTime of the user</td>
+        </tr>
+        <tr>
+          <td>remove end time</td>
+          <td>Removes the currently set endTime, if applicable</td>
+        </tr>
+        <tr>
+          <td>add task (task_name)</td>
+          <td>Adds the specified task to the list and calculates the completion time</td>
+        </tr>
+        <tr>
+          <td>display tasks</td>
+          <td>Displays all currently set tasks, if applicable</td>
+        <tr>
+      </table>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script>
+      function displayGuide() {
+        var x = document.getElementById("guideTable");
+        if (x.style.display === "none") {
+          x.style.display = "block";
+        } else {
+          x.style.display = "none";
+        }
+      }
+
         $(document).ready(function() {
             $('#user-query').keypress(function(e) {
                 if (e.which == 13) {
