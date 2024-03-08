@@ -73,6 +73,12 @@ def addTaskNumber():
   global taskNumber
   taskNumber += 1 
 
+# Performs the all the actions when a normal task (a task that does not require additonal conditions to be checked) needs to be added to the table
+def addTaskNormal(taskCompletionTime, task):
+  addTaskNumber()
+  tasks.append((taskNumber, task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+  return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+
 def calculateTaskTime(task):
   global studentStartTime
   global currentTask
@@ -141,20 +147,24 @@ def calculateTaskTime(task):
       if dueDateQuestion == "yes":
         dueDateTime = input("What is the due date for this task? [YYYY-MM-DD HH:MM:SS] ")
         convertedDueDate = datetime.datetime.strptime(dueDateTime,"%Y-%m-%d %H:%M:%S")
+        taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration[taskSplit[elementIndex]])
         if taskCompletionTime > convertedDueDate:
             return "The task cannot be added as it is exceeds the due date."
-      taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration[taskSplit[elementIndex]])
-    
+        elif (taskCompletionTime > studentEndTime) & (taskCompletionTime < convertedDueDate):
+            return "It looks like your end time exceeds the task completion time but you have time to finish it before the due date."
+        else:
+          print("Start the condition")
+          addTaskNormal(taskCompletionTime, task)
+          print("Left the condition")
+      elif dueDateQuestion == "no":
+       addTaskNormal(taskCompletionTime, task)
+          
       if taskCompletionTime > studentEndTime:
         taskCompletionTime = studentEndTime
         addTaskNumber()
         tasks.append((taskNumber,task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
         return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
-      
-      studentStartTime = taskCompletionTime
-      currentTask = task
-      tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
-      return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+
     else:
       return "The task you entered cannot be found. Supported tasks are:\n\n" + '\n'.join(f'- {task}' for task in taskDuration.keys())
 
