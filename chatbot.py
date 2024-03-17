@@ -83,65 +83,11 @@ def calculateTaskTime(task):
   global studentStartTime
   global currentTask
   taskSplit = task.split()
-  if 'quiz' in taskSplit:
-    taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['quiz'])
-    while True:
-      preparation = input("How prepared are you for the quiz? (1=Not Prepared, 4=Mostly Prepared)")
-      if preparation == "1":
-        taskCompletionTime += datetime.timedelta(minutes=30)
-        break
-      elif preparation == "2":
-        taskCompletionTime += datetime.timedelta(minutes=15)
-        break
-      elif preparation == "3":
-        taskCompletionTime
-        break
-      elif preparation == "4":
-        taskCompletionTime -= datetime.timedelta(minutes=10)
-        break
-    if taskCompletionTime > studentEndTime:
-      taskCompletionTime = studentEndTime
-      tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
-      addTaskNumber()
-      return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
-    studentStartTime = taskCompletionTime
-    currentTask = task
-    tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
-    return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
-  
-  elif 'test' in taskSplit:
-    taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['test'])
-    while True:
-      preparation = input("How prepared are you for the test? (1=Not Prepared, 4=Mostly Prepared)")
-      if preparation == "1":
-        taskCompletionTime += datetime.timedelta(minutes=30)
-        break
-      elif preparation == "2":
-        taskCompletionTime += datetime.timedelta(minutes=15)
-        break
-      elif preparation == "3":
-        taskCompletionTime
-        break
-      elif preparation == "4":
-        taskCompletionTime -= datetime.timedelta(minutes=10)
-        break
-    if taskCompletionTime > studentEndTime:
-      taskCompletionTime = studentEndTime
-      tasks.append((task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
-      return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
-    studentStartTime = taskCompletionTime
-    currentTask = task
-    addTaskNumber()
-    tasks.append((taskNumber,task, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
-    return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
-      
-  else:
-    elementIndex = -1
-    for x in range(0, len(taskSplit)):
-      if taskSplit[x] in taskList:
+  elementIndex = -1
+  for x in range(0, len(taskSplit)):
+    if taskSplit[x] in taskList:
         elementIndex = x
         break
-
     if elementIndex != -1:
       dueDateQuestion = input("Do you have any specific due date that the task has to be completed by? [yes/no] ")
       if dueDateQuestion == "yes":
@@ -167,6 +113,49 @@ def calculateTaskTime(task):
 
     else:
       return "The task you entered cannot be found. Supported tasks are:\n\n" + '\n'.join(f'- {task}' for task in taskDuration.keys())
+
+def calculateQuizTime(preparationLevel):
+  global studentStartTime
+  global currentTask
+  taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['quiz'])
+  if preparationLevel == "1":
+    taskCompletionTime += datetime.timedelta(minutes=30)
+  elif preparationLevel == "2":
+    taskCompletionTime += datetime.timedelta(minutes=15)
+  elif preparationLevel == "3":
+    taskCompletionTime
+  elif preparationLevel == "4":
+    taskCompletionTime -= datetime.timedelta(minutes=10)
+  if taskCompletionTime > studentEndTime:
+    taskCompletionTime = studentEndTime
+    addTaskNumber()
+    tasks.append((taskNumber, "quiz", taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+    return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+  studentStartTime = taskCompletionTime
+  addTaskNormal(taskCompletionTime, "quiz")
+  
+
+
+def calculateTestTime(preparationLevel):
+  global studentStartTime
+  global currentTask
+  taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['test'])
+  if preparationLevel == "1":
+    taskCompletionTime += datetime.timedelta(minutes=30)
+  elif preparationLevel == "2":
+    taskCompletionTime += datetime.timedelta(minutes=15)
+  elif preparationLevel == "3":
+    taskCompletionTime
+  elif preparationLevel == "4":
+    taskCompletionTime -= datetime.timedelta(minutes=10)
+  if taskCompletionTime > studentEndTime:
+    taskCompletionTime = studentEndTime
+    addTaskNumber()
+    tasks.append((taskNumber, "test", taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+    return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
+  studentStartTime = taskCompletionTime
+  addTaskNormal(taskCompletionTime, "test")
+  
 
 def displayTaskTable():
   df = pd.DataFrame(tasks, columns=['Task #','Name', 'Completion Time'])
@@ -196,7 +185,14 @@ pairs = [
         r"add task (.*)",
         [lambda userInput: calculateTaskTime(userInput) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)]
     ],
-
+ [
+        r"add quiz (.*)",
+        [lambda userQuizPreperation: calculateQuizTime(userQuizPreperation) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)]
+    ],
+     [
+        r"add test (.*)",
+        [lambda userTestPreperation: calculateTestTime(userTestPreperation) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)]
+    ],
     [
         r"set start time (.*)",
         [lambda userInput: setStudentStartTime(userInput) if not studentStartTime else "Start time is already set."], # Prompts the user to set a start time if they try to add a task before setting it
