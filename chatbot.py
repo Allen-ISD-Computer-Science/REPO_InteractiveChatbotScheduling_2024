@@ -120,52 +120,66 @@ def calculateTaskTime(task):
     else:
       return "The task you entered cannot be found. Supported tasks are:\n\n" + '\n'.join(f'- {task}' for task in taskDuration.keys())
 
-def calculateQuizTime(preparationLevel):
+def calculateQuizTime(taskPreparation):
   global studentStartTime
   global currentTask
 
+  taskSplit = taskPreparation.split()
   taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['quiz'])
-  if preparationLevel == "1":
+  if taskSplit[len(taskSplit) - 1] == "1":
     taskCompletionTime += datetime.timedelta(minutes=30)
-  elif preparationLevel == "2":
+  elif taskSplit[len(taskSplit) - 1] == "2":
     taskCompletionTime += datetime.timedelta(minutes=15)
-  elif preparationLevel == "3":
+  elif taskSplit[len(taskSplit) - 1] == "3":
     taskCompletionTime
-  elif preparationLevel == "4":
+  elif taskSplit[len(taskSplit) - 1] == "4":
     taskCompletionTime -= datetime.timedelta(minutes=10)
+
+  if len(taskSplit) > 1:
+    taskName = ' '.join(taskSplit[:-1]) + " quiz"
+  else:
+    return "Please specify the quiz name. (Note: The quiz is not being added)"
+  
   if taskCompletionTime > studentEndTime:
     taskCompletionTime = studentEndTime
     addTaskNumber()
-    tasks.append((taskNumber, "quiz", taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+    tasks.append((taskNumber, taskName, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
     return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
   
   studentStartTime = taskCompletionTime
   addTaskNumber()
-  tasks.append((taskNumber, "quiz", taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+  tasks.append((taskNumber, taskName, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
   return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
   
-def calculateTestTime(preparationLevel):
+def calculateTestTime(taskPreparation):
   global studentStartTime
   global currentTask
 
+  taskSplit = taskPreparation.split()
   taskCompletionTime = studentStartTime + datetime.timedelta(minutes=taskDuration['test'])
-  if preparationLevel == "1":
+  if taskSplit[len(taskSplit) - 1] == "1":
     taskCompletionTime += datetime.timedelta(minutes=30)
-  elif preparationLevel == "2":
+  elif taskSplit[len(taskSplit) - 1] == "2":
     taskCompletionTime += datetime.timedelta(minutes=15)
-  elif preparationLevel == "3":
+  elif taskSplit[len(taskSplit) - 1] == "3":
     taskCompletionTime
-  elif preparationLevel == "4":
+  elif taskSplit[len(taskSplit) - 1] == "4":
     taskCompletionTime -= datetime.timedelta(minutes=10)
+  
+  if len(taskSplit) > 1:
+    taskName = ' '.join(taskSplit[:-1]) + " test"
+  else:
+    return "Please specify the test name. (Note: The test is not being added)"
+
   if taskCompletionTime > studentEndTime:
     taskCompletionTime = studentEndTime
     addTaskNumber()
-    tasks.append((taskNumber, "test", taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+    tasks.append((taskNumber, taskName, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
     return "The task has been added. Since the task exceeds the end time, the completion for this task is the end time. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
   
   studentStartTime = taskCompletionTime
   addTaskNumber()
-  tasks.append((taskNumber, "test", taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
+  tasks.append((taskNumber, taskName, taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")))
   return "The task has been added. Task completion time: " + taskCompletionTime.strftime("%Y-%m-%d %H:%M:%S")
 
 def displayTaskTable():
