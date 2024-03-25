@@ -2,15 +2,39 @@ body {
   background: linear-gradient(-90deg, #62275c, #000000, #1b1f52)
 }
 
+.center {
+  position: absolute;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+h1 {
+    font-family: verdana;
+}
+
+th, td {
+  padding: 5px;
+}
+
+.button {
+  position: absolute;
+  top: 5%;
+  left: 10%;
+  background-color: black;
+  font-family: verdana;
+}
 
 #chatbox {
-  height: 300px;
+  height: 80vh;
   overflow-y: auto;
 }
+
 .user-input {
   text-align: right;
   margin: 20px;
 }
+
 .chatbot-response {
   text-align: left;
   margin: 30px;
