@@ -208,15 +208,15 @@ pairs = [
     ],
    [
         r"add task (.*)",
-        [lambda userInput: calculateTaskTime(userInput) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)]
+        [lambda userInput: calculateTaskTime(userInput) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)] # Adds a task to the task list, including due date if applicable
     ],
  [
         r"add quiz (.*)",
-        [lambda userQuizPreparation: calculateQuizTime(userQuizPreparation) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)]
+        [lambda userQuizPreparation: calculateQuizTime(userQuizPreparation) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)] # Adds a test to the task list, including name and preparation
     ],
      [
         r"add test (.*)",
-        [lambda userTestPreparation: calculateTestTime(userTestPreparation) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)]
+        [lambda userTestPreparation: calculateTestTime(userTestPreparation) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)] # Adds a test to the task list, including name and preparation
     ],
     [
         r"set start time (.*)",
