@@ -246,7 +246,7 @@ chat = SchedulerChatbot(pairs, reflections)
 def landing():
     return render_template("index.html")
 
-@app.route("/chatbot")
+@app.route("/chatbot.html")
 def route_chatbot():
     return render_template("chatbot.html")
 

@@ -13,10 +13,8 @@ h1 {
     font-family: verdana;
 }
 
-
 th, td {
-  padding: 10px;
-  width: 300px;
+  padding: 5px;
 }
 
 .button {
@@ -31,14 +29,13 @@ th, td {
   height: 80vh;
   overflow-y: auto;
 }
+
 .user-input {
   text-align: right;
   margin: 20px;
 }
+
 .chatbot-response {
   text-align: left;
   margin: 30px;
-}
-* {
-  color:white;
 }

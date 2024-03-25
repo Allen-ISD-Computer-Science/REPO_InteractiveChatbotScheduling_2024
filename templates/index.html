@@ -4,29 +4,125 @@
 <title>Interactive Chatbot Scheduling</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/static/index.css">
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
 <body>
-
-  <ul class="ul">
-    <li class="active" href="#home">Home</li>
-    <li href="#about">About</li>
-    <li href="#contact">Contact</li>
+  <ul class="list-style">
+    <li id="homeNav" class="active" onclick=displayHome()>Home</li>
+    <li id="chatNav" onclick=displayScreen()>Chat</li>
+    <li style="float:right;" onclick=displayGuide()>Help</li>
   </ul>
 
-  <div class="center">
-    <h1>Interactive Chatbot Scheduling</h1>
-    <button class="button" onClick="displayScreen()">Chat</button>
-  </div>
+  <section id="indexSection" style="display:block;">
+    <div class="center">
+      <h1>Interactive Chatbot Scheduling</h1>
+      <button class="button" onclick="displayScreen()">Chat</button>
+    </div>
 
-  <div id="chatScreen">
-    <img src="https://www.iconninja.com/files/148/341/227/telegram-send-chat-media-message-icon.svg" alt="Send button">
-  </div>
+    <div id="chatScreen">
+      <img src="https://www.iconninja.com/files/148/341/227/telegram-send-chat-media-message-icon.svg" alt="Send button">
+    </div>
+  </section>
 
+  <section id="chatSection" style="display:none;">
+    <div class="container">
+      <div class="row">
+          <div class="col-md-6 offset-md-3">
+              <h1 class="text-center">Chatbot</h1>
+              <div id="chatbox"></div>
+              <input id="user-query" type="text" class="form-control" placeholder="Please type your message here ...">
+          </div>
+      </div>
+    </div>
+
+    <div>
+      <table id="guideTable" style="width:27%;height:100%;display:none;position:absolute;top:9%;left:1%;">
+        <tr>
+          <th>Command</th>
+          <th>Function</th>
+        </tr>
+        <tr>
+          <td>set start time (time)</td>
+          <td>Defines the startTime of the user</td>
+        </tr>
+        <tr>
+          <td>remove start time</td>
+          <td>Removes the currently set startTime, if applicable</td>
+        </tr>
+        <tr>
+          <td>set end time (time)</td>
+          <td>Defines the endTime of the user</td>
+        </tr>
+        <tr>
+          <td>remove end time</td>
+          <td>Removes the currently set endTime, if applicable</td>
+        </tr>
+        <tr>
+          <td>add task (task_name)</td>
+          <td>Adds the specified task to the list and calculates the completion time</td>
+        </tr>
+        <tr>
+          <td>add quiz (preparation_level [1>>>4])</td>
+          <td>Adds the specified quiz to the list and calculates the completion time</td>
+        </tr>
+        <tr>
+          <td>add test (preparation_level [1>>>4])</td>
+          <td>Adds the specified test to the list and calculates the completion time</td>
+        </tr>
+        <tr>
+          <td>display tasks</td>
+          <td>Displays all currently set tasks, if applicable</td>
+        <tr>
+      </table>
+    </div>
+  </section>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script>
     function displayScreen() {
-      location.href="../chatbot.html"
+      var botScreen = document.getElementById("chatSection");
+      var botNav = document.getElementById("chatNav");
+      botScreen.style.display = "block";
+      botNav.className = "active";
+      var homeScreen = document.getElementById("indexSection");
+      var homeNav = document.getElementById("homeNav");
+      homeScreen.style.display = "none";
+      homeNav.classList.remove("active");
     }
+
+    function displayHome() {
+      var botScreen = document.getElementById("chatSection");
+      var botNav = document.getElementById("chatNav");
+      botScreen.style.display = "none";
+      botNav.classList.remove("active");
+      var homeScreen = document.getElementById("indexSection");
+      var homeNav = document.getElementById("homeNav");
+      homeScreen.style.display = "block";
+      homeNav.className = "active";
+    }
+
+    function displayGuide() {
+        var x = document.getElementById("guideTable");
+        if (x.style.display === "none") {
+          x.style.display = "block";
+        } else {
+          x.style.display = "none";
+        }
+      }
+
+      $(document).ready(function() {
+          $('#user-query').keypress(function(e) {
+              if (e.which == 13) {
+                  let userText = $('#user-query').val();
+                  $('#user-query').val('');
+                  $('#chatbox').append('<p class="user-input">' + userText + '</p>');
+                  $.get("/get", { msg: userText }).done(function(data) {
+                      $('#chatbox').append('<p class="chatbot-response">' + data + '</p>');
+                  });
+              }
+          });
+      });
   </script>
 
 </body>
