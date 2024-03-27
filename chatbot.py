@@ -6,9 +6,121 @@ import datetime
 import pytz
 import time
 import os
+import re
+import requests
+import pathlib
+import textwrap
+
+import google.generativeai as genai
 
 
 app = Flask(__name__)
+
+# Used to securely store the API key
+from dotenv import load_dotenv
+
+def configure():
+  load_dotenv()
+
+configure()
+
+# Using `os.getenv('GOOGLE_API_KEY')` to fetch an environment variable.
+GOOGLE_API_KEY=os.getenv('GOOGLE_API_KEY')
+
+genai.configure(api_key=GOOGLE_API_KEY)
+
+
+# Set up the model
+generation_config = {
+  "temperature": 0.9,
+  "top_p": 1,
+  "top_k": 1,
+  "max_output_tokens": 2048,
+}
+
+safety_settings = [
+  {
+    "category": "HARM_CATEGORY_HARASSMENT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_HATE_SPEECH",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+]
+
+model = genai.GenerativeModel(model_name="gemini-1.0-pro",
+                              generation_config=generation_config,
+                              safety_settings=safety_settings)
+
+convo = model.start_chat(history=[
+  {
+    "role": "user",
+    "parts": ["Only respond under the following conditions:You are a task scheduler chatbot. When a user types in a task with the following “add task [task_name], you need to ask the user if they have any pending due dates. \n\n\"Do you have any specific due date that the task has to be completed by? [yes/no] \")\n\n(\"What is the due date for this task? [YYYY-MM-DD HH:MM:SS] \")"]
+  },
+  {
+    "role": "model",
+    "parts": ["add task Study for midterm\n\nDo you have any specific due date that the task has to be completed by? [yes/no]"]
+  },
+  {
+    "role": "user",
+    "parts": ["add task notes"]
+  },
+  {
+    "role": "model",
+    "parts": ["Do you have any specific due date that the task has to be completed by? [yes/no]"]
+  },
+  {
+    "role": "user",
+    "parts": ["Please replace the task in the question with the task that the user has provided, like in the previous one, notes."]
+  },
+  {
+    "role": "model",
+    "parts": ["add task notes\n\nDo you have any specific due date that the task has to be completed by? [yes/no]"]
+  },
+  {
+    "role": "user",
+    "parts": ["add task homework"]
+  },
+  {
+    "role": "model",
+    "parts": ["Do you have any specific due date that the task has to be completed by? [yes/no]"]
+  },
+  {
+    "role": "user",
+    "parts": ["yes"]
+  },
+  {
+    "role": "model",
+    "parts": ["What is the due date for this task? [YYYY-MM-DD HH:MM:SS]"]
+  },
+  {
+    "role": "user",
+    "parts": ["2024-03-28 12:00:00"]
+  },
+  {
+    "role": "model",
+    "parts": ["Task: homework\nDue Date: 2024-03-28 12:00:00\n\nIs this correct? [yes/no]"]
+  },
+  {
+    "role": "user",
+    "parts": ["yes"]
+  },
+  {
+    "role": "model",
+    "parts": ["Task: homework\nDue Date: 2024-03-28 12:00:00\n\nTask added successfully."]
+  },
+])
+
+
 # As each valid task is submitted by the user, it gets added to the tasks array which will be used to display the table 
 tasks = []
 studentStartTime = None
@@ -208,7 +320,7 @@ pairs = [
     ],
    [
         r"add task (.*)",
-        [lambda userInput: calculateTaskTime(userInput) if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)] # Adds a task to the task list, including due date if applicable
+        [lambda x: get_ai_chatbot_response() if (studentStartTime != None and studentEndTime != None) else "Please tell me when you will be working on your tasks.\nStart Time: " + str(studentStartTime) + " | End Time: " + str(studentEndTime)] # Adds a task to the task list, including due date if applicable
     ],
  [
         r"add quiz (.*)",
@@ -240,8 +352,7 @@ pairs = [
     ],
     
 ]
-chat = SchedulerChatbot(pairs, reflections)
-
+chatbot = SchedulerChatbot(pairs, reflections)
 @app.route("/")
 def landing():
     return render_template("index.html")
@@ -253,8 +364,15 @@ def route_chatbot():
 @app.route("/get")
 def get_chatbot_response():
     displayResponse = request.args.get('msg')
-    resp = str(chat.respond(displayResponse))
+    resp = str(chatbot.respond(displayResponse))
     return resp
 
-if __name__ == '__main__':
-      app.run()
+def get_ai_chatbot_response():
+    displayResponse = request.args.get('msg')
+    resp = str(convo.send_message(displayResponse, generation_config=generation_config))
+    resp_extracted = re.search(r"'text': '([^']*)'", resp)
+    if resp_extracted:
+        ai_response = resp_extracted.group(1)
+        return ai_response
+if __name__ == "__main__":
+    app.run()
